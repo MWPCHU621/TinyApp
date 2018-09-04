@@ -1,1 +1,17 @@
 <h3> URL Shortener mini webapp</h3>
+
+
+<% if(username) { %>
+  <form action="/logout" method="POST">
+    <input type="submit" value="Logout">
+    <label> <%= username %> </label>
+  </form>
+<% } else{ %>
+  <form action="/login" method="POST">
+    <label for="name">Enter Username: </label>
+    <input id="name" type="text" name="name" placeholder="username" style="width: 300px">
+    <input type="submit" value="Login">
+  </form>
+<% } %>
+
+
