@@ -9,9 +9,15 @@
     <% include ./partials/_header%>
   </header>
 
-  <h1> TEST 2</h1>
+  <h1>ShortURL :  <%= shortURL %> </h1>
 
-  Short URL is  <%= shortURL %> and long URL is <%= longURL %>
+  <form action="/urls/>" method="POST">
+    <label for="longURL">Enter your updated long URL:</label>
+    <input id="longURL" type="text" name="longURL" placeholder="<%=longURL%>">
+    <input type="submit" value="Update">
+    <a href = "/urls"><button type="button">Back to Home</button></a>
+  </form>
+
 
 </body>
 </html>
