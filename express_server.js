@@ -23,19 +23,38 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-
+//renders urls_new.ejs template html
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+//creates new entry in urlDatabase
 app.post("/urls", (req, res) => {
   let shortkey = generateRandomString();
   urlDatabase[shortkey] = req.body.longURL;
-  console.log(urlDatabase);  // debug statement to see POST parameters
+  //console.log(urlDatabase);  // debug statement to see POST parameters
   res.redirect("http://localhost:8080/urls/" + shortkey);         // Respond with 'Ok' (we will replace this)
 });
 
-//
+//deletes both shortURL and longURL from urlDatabase
+app.post("/urls/:id/delete", (req, res) => {
+  let idToDelete = req.params.id;
+  delete urlDatabase[idToDelete];
+  //console.log(urlDatabase);
+  res.redirect("/urls");
+});
+
+//updates longURL
+app.post("/urls/:id", (req, res) => {
+  let update = req.body.longURL;
+  let key = req.params.id;
+  console.log(req.params.id);
+  urlDatabase[key] = update;
+  res.redirect("/urls")
+});
+
+
+//redirects to the actual longURL webpage
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
