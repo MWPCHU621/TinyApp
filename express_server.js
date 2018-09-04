@@ -1,6 +1,8 @@
 var express = require("express");
+var cookieParser = require('cookie-parser')
 var app = express();
 app.set("view engine", "ejs");
+app.use(cookieParser());
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -19,7 +21,9 @@ app.get("/", (req, res) => {
 
 //html page with all the urls
 app.get("/urls", (req, res) => {
-  let templateVars = {urls: urlDatabase};
+  let templateVars = {
+    username:req.cookies["username"],
+    urls: urlDatabase};
   res.render("urls_index", templateVars);
 });
 
@@ -44,11 +48,24 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect("/urls");
 });
 
+//creates login Form and set cookie with
+//username = submitted data.
+app.post("/login", (req, res) => {
+  //console.log(req.body.name);
+  res.cookie("username",req.body.name);
+  res.redirect("/urls");
+});
+
+//creates logout form and displays username.
+app.post("/logout", (req, res) => {
+  res.clearCookie("username");
+  res.redirect("/urls");
+});
+
 //updates longURL
 app.post("/urls/:id", (req, res) => {
   let update = req.body.longURL;
   let key = req.params.id;
-  console.log(req.params.id);
   urlDatabase[key] = update;
   res.redirect("/urls")
 });
@@ -64,7 +81,8 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   let templateVars = {
     shortURL: req.params.id,
-    longURL: urlDatabase[req.params.id]
+    longURL: urlDatabase[req.params.id],
+    username: req.cookies["username"]
   };
   res.render("urls_show", templateVars);
 
