@@ -10,21 +10,26 @@
   </header>
 
 
-  <h1> TEST </h1>
+  <h1> Homepage </h1>
 
   <p> <%= urls.length %></p>
 
   <ul>
     <% for(let url in urls) { %>
       <li>
-        <%= urls[url]%> shorted form is <%=url%>
-        <a href="/urls/<%= url %>">show</a>
+        <%=url%> -> <a href="<%= urls[url]%>"> <%= urls[url]%></a>
+         <a href="/urls/<%=url%>" style="padding-left:10px">Edit</a>
+        <form method="POST" action="/urls/<%=url%>/delete"><button type="submit">Delete</button></form>
+
       </li>
     <% }; %>
   </ul>
+
+
 
   <a href = "#">Shortened URL</a>
 
 </body>
 </html>\
+
 
