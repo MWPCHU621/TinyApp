@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TinyApp</title>
+</head>
+<body>
+  <!-- Add your EJS code here -->
+  <header>
+    <% include ./partials/_header%>
+  </header>
+
+
+  <h1> TEST </h1>
+
+  <p> <%= urls.length %></p>
+
+  <ul>
+    <% for(let url in urls) { %>
+      <li>
+        <%= urls[url]%> shorted form is <%=url%>
+        <a href="/urls/<%= url %>">show</a>
+      </li>
+    <% }; %>
+  </ul>
+
+  <a href = "#">Shortened URL</a>
+
+</body>
+</html>\
+
