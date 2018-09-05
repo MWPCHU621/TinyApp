@@ -25,17 +25,17 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: encryptPassword("purple-monkey-dinosaur")
   },
  "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    password: encryptPassword("dishwasher-funk")
   },
   "Juunis": {
     id: "Juunis",
     email: "deathxkeeper@hotmail.com",
-    password: "helloworld"
+    password: encryptPassword("helloworld")
   }
 }
 
@@ -266,6 +266,9 @@ function generateRandomString() {
   return result;
 }
 
+function encryptPassword(string) {
+  return bcrypt.hashSync(string, 10);
+}
 
 
 
