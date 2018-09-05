@@ -1,18 +1,3 @@
-<<<<<<< HEAD
-var cookieSession = require('cookie-session')
-var express = require("express");
-//var cookieParser = require('cookie-parser')
-var app = express();
-app.set("view engine", "ejs");
-//app.use(cookieParser());
-app.use(cookieSession({
-  name: 'session',
-  keys: [123, 456, 789],
-
-  // Cookie Options
-  maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}));
-=======
 var cookieSession = require('cookie-session');
 var express = require("express");
 //var cookieParser = require('cookie-parser');
@@ -28,7 +13,6 @@ app.use(cookieSession({
   // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }))
->>>>>>> specific-features
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -90,10 +74,6 @@ app.get("/urls", (req, res) => {
     user: users,
     urls: userURL,
   };
-<<<<<<< HEAD
-  console.log(req.session.user_id);
-=======
->>>>>>> specific-features
   if(req.session.user_id)
   {
     templateVars["cookies"] = req.session.user_id;
@@ -205,10 +185,7 @@ app.post("/register", (req, res) => {
       email: req.body.email,
       password: hashedPassword
     };
-<<<<<<< HEAD
-=======
     console.log(users[userId]);
->>>>>>> specific-features
     req.session.user_id = userId;
     //res.cookie("user_id", userId);
 
@@ -255,10 +232,6 @@ function getId(email) {
 
 //logs the user out and clears cookie while redirecting to login page
 app.post("/logout", (req, res) => {
-<<<<<<< HEAD
-  //console.log(req.cookie(user_id));
-=======
->>>>>>> specific-features
   req.session = null;
   //res.clearCookie("user_id");
   res.redirect("/login");
@@ -310,7 +283,6 @@ function generateRandomString() {
 function encryptPassword(string) {
   return bcrypt.hashSync(string, 10);
 }
-
 
 
 
