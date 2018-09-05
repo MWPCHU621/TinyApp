@@ -30,6 +30,7 @@ var urlDatabase = {
   }
 };
 
+//user database info
 const users = {
   "userRandomID": {
     id: "userRandomID",
