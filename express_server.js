@@ -14,6 +14,24 @@ var urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  },
+  "PatrickChu": {
+    id: "Juunis",
+    email: "deathxkeeper@hotmail.com",
+    password: "HelloWorld"
+  }
+}
+
 //root html site
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -32,12 +50,32 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+//renders the login page.
+app.get("/register", (req, res) => {
+  res.render("urls_register");
+});
+
 //creates new entry in urlDatabase
 app.post("/urls", (req, res) => {
   let shortkey = generateRandomString();
   urlDatabase[shortkey] = req.body.longURL;
   //console.log(urlDatabase);  // debug statement to see POST parameters
   res.redirect("http://localhost:8080/urls/" + shortkey);         // Respond with 'Ok' (we will replace this)
+});
+
+//adds a new user object to global database.
+//holds user's email, password, and userId.
+app.post("/register", (req, res) => {
+  let userId = generateRandomString();
+  //console.log(req.body.email);
+  users[userId] = {
+    id: userId,
+    email: req.body.email,
+    password: req.body.password
+  };
+  res.cookie("username", userId);
+  res.redirect("/urls");
+  console.log(users);
 });
 
 //deletes both shortURL and longURL from urlDatabase
@@ -59,7 +97,7 @@ app.post("/login", (req, res) => {
 //creates logout form and displays username.
 app.post("/logout", (req, res) => {
   res.clearCookie("username");
-  res.redirect("/urls");
+  res.redirect("/register");
 });
 
 //updates longURL
