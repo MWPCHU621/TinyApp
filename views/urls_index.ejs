@@ -12,15 +12,12 @@
 
   <h1> Homepage </h1>
 
-  <p> <%= urls.length %></p>
-
   <ul>
-    <% for(let url in urls) { %>
+    <% for(let url of urls) { %>
       <li>
-        <%=url%> -> <a href="<%= urls[url]%>"> <%= urls[url]%></a>
-        <a href="/urls/<%=url%>" style="padding-left:10px">Edit</a>
-        <form method="POST" action="/urls/<%=url%>/delete"><button type="submit">Delete</button></form>
-
+        <%=url.shortURL%> -> <a href="<%= url.longURL%>"> <%= url["longURL"]%></a>
+        <a href="/urls/<%=url.shortURL%>" style="padding-left:10px">Edit</a>
+        <form method="POST" action="/urls/<%=url.shortURL%>/delete"><button type="submit">Delete</button></form>
       </li>
     <% }; %>
   </ul>
@@ -32,6 +29,6 @@
   <a href = "/urls/new">Create new short URL</a>
 
 </body>
-</html>\
+</html>
 
 

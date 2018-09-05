@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 var cookieSession = require('cookie-session')
 var express = require("express");
 //var cookieParser = require('cookie-parser')
@@ -11,6 +12,23 @@ app.use(cookieSession({
   // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
+=======
+var cookieSession = require('cookie-session');
+var express = require("express");
+//var cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
+var app = express();
+app.set("view engine", "ejs");
+//app.use(cookieParser());
+
+app.use(cookieSession({
+  name: 'session',
+  keys: ["123", "456", "789"],
+
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
+>>>>>>> specific-features
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -18,25 +36,31 @@ app.use(bodyParser.urlencoded({extended: true}));
 const PORT = 8080; // default port 8080
 
 var urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {
+    longURL: "http://www.lighthouselabs.ca",
+    userID: "userRandomID"
+  },
+  "9sm5xK": {
+    longURL: "http://www.google.com",
+    userID: "Juunis"
+  }
 };
 
 const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: encryptPassword("purple-monkey-dinosaur")
   },
  "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    password: encryptPassword("dishwasher-funk")
   },
   "Juunis": {
     id: "Juunis",
     email: "deathxkeeper@hotmail.com",
-    password: "helloworld"
+    password: encryptPassword("helloworld")
   }
 }
 
@@ -49,11 +73,26 @@ app.get("/", (req, res) => {
 
 //renders urls_index.ejs file
 app.get("/urls", (req, res) => {
+  //created empty array to hold user's short/long URL only.
+  let userURL = [];
+  //loops through the database of objects
+  for(let url in urlDatabase) {
+    //compares to see whether the id for a specific URL is the same as the current cookie user.
+    if(urlDatabase[url]["userID"] === req.session.user_id) {
+      //creates a shallow copy of our database that will also have a shortURL key and value pair.
+      let copyURL = Object.assign({shortURL: url}, urlDatabase[url]);
+      //pushes shallow object into array.
+      userURL.push(copyURL);
+    }
+  }
   let templateVars = {
     user: users,
-    urls: urlDatabase,
+    urls: userURL,
   };
+<<<<<<< HEAD
   console.log(req.session.user_id);
+=======
+>>>>>>> specific-features
   if(req.session.user_id)
   {
     templateVars["cookies"] = req.session.user_id;
@@ -101,7 +140,7 @@ app.get("/login", (req, res) => {
 
 //redirects to the actual longURL webpage
 app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase[req.params.shortURL];
+  let longURL = urlDatabase[req.params.shortURL]["longURL"];
   res.redirect(longURL);
 });
 
@@ -109,10 +148,10 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   let templateVars = {
     shortURL: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id]["longURL"],
     user: users
   };
-  if(req.cookies.user_id)
+  if(req.session.user_id)
   {
     templateVars["cookies"] = req.session.user_id;
     templateVars["loggedIn"] = true;
@@ -134,9 +173,12 @@ app.get("/urls/:id", (req, res) => {
 app.post("/urls", (req, res) => {
   let shortkey = generateRandomString();
   let longURL = req.body.longURL;
-  urlDatabase[shortkey] = longURL;
-  //console.log(urlDatabase);  // debug statement to see POST parameters
-  res.redirect("http://localhost:8080/urls/" + shortkey);         // Respond with 'Ok' (we will replace this)
+  let userID = req.session.user_id;
+  urlDatabase[shortkey] = {
+    longURL: longURL,
+    userID: userID
+  };
+  res.redirect("http://localhost:8080/urls/");         // Respond with 'Ok' (we will replace this)
 });
 
 //adds a new user object to global database.
@@ -156,16 +198,20 @@ app.post("/register", (req, res) => {
     });
   } else {
     let userId = generateRandomString();
+    let hashedPassword = bcrypt.hashSync(req.body.password, 10);
     users[userId] = {
       id: userId,
       email: req.body.email,
-      password: req.body.password
+      password: hashedPassword
     };
+<<<<<<< HEAD
+=======
+    console.log(users[userId]);
+>>>>>>> specific-features
     req.session.user_id = userId;
     //res.cookie("user_id", userId);
 
     res.redirect("/login");
-    //console.log(users);
   };
 });
 
@@ -175,7 +221,6 @@ app.post("/login", (req, res) => {
   //let userId = Object.values(users).map(users => users.id);
   let userEmail = Object.values(users).map(users => users.email);
   let statusCode = 200;
-  //console.log(userEmail, req.body.email);
   if(!userEmail.includes(req.body.email)) {
     res.status(403).json({
       error: "Cannot find email"
@@ -183,11 +228,11 @@ app.post("/login", (req, res) => {
   }
   else {
     let userId = getId(req.body.email);
-    //console.log(users[userId]);
-    if(users[userId]["password"] !== req.body.password) {
+    if(!bcrypt.compareSync(req.body.password, users[userId]["password"])) {
       res.status(403).json({
         error: "PASSWORD DOES NOT MATCH"
       });
+      //users[userId]["password"] !== req.body.password
     }
     else {
       req.session.user_id = users[userId]["id"];
@@ -209,7 +254,10 @@ function getId(email) {
 
 //logs the user out and clears cookie while redirecting to login page
 app.post("/logout", (req, res) => {
+<<<<<<< HEAD
   //console.log(req.cookie(user_id));
+=======
+>>>>>>> specific-features
   req.session = null;
   //res.clearCookie("user_id");
   res.redirect("/login");
@@ -220,7 +268,6 @@ app.post("/logout", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   let idToDelete = req.params.id;
   delete urlDatabase[idToDelete];
-  //console.log(urlDatabase);
   res.redirect("/urls");
 });
 
@@ -229,7 +276,7 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   let update = req.body.longURL;
   let key = req.params.id;
-  urlDatabase[key] = update;
+  urlDatabase[key]["longURL"] = update;
   res.redirect("/urls")
 });
 
@@ -259,6 +306,9 @@ function generateRandomString() {
   return result;
 }
 
+function encryptPassword(string) {
+  return bcrypt.hashSync(string, 10);
+}
 
 
 
