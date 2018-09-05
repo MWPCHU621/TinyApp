@@ -40,7 +40,7 @@ app.get("/", (req, res) => {
 //html page with all the urls
 app.get("/urls", (req, res) => {
   let templateVars = {
-    username:req.cookies["username"],
+    username:req.cookies[users],
     urls: urlDatabase};
   res.render("urls_index", templateVars);
 });
@@ -53,6 +53,10 @@ app.get("/urls/new", (req, res) => {
 //renders the login page.
 app.get("/register", (req, res) => {
   res.render("urls_register");
+});
+
+app.get("/login", (req, res) => {
+  res.render("urls_login");
 });
 
 //creates new entry in urlDatabase
@@ -89,6 +93,10 @@ app.post("/register", (req, res) => {
     res.redirect("/urls");
     console.log(users);
   };
+});
+
+app.post("/login", (req, res) => {
+
 });
 
 //deletes both shortURL and longURL from urlDatabase
@@ -133,7 +141,7 @@ app.get("/urls/:id", (req, res) => {
   let templateVars = {
     shortURL: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: req.cookies["username"]
+    username: req.cookies[users]
   };
   res.render("urls_show", templateVars);
 
