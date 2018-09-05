@@ -195,10 +195,11 @@ app.post("/login", (req, res) => {
   }
   else {
     let userId = getId(req.body.email);
-    if(users[userId]["password"] !== req.body.password) {
+    if(!bcrypt.compareSync(req.body.password, users[userId]["password"])) {
       res.status(403).json({
         error: "PASSWORD DOES NOT MATCH"
       });
+      //users[userId]["password"] !== req.body.password
     }
     else {
       res.cookie("user_id", users[user]["id"]);
