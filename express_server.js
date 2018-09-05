@@ -1,9 +1,18 @@
+var cookieSession = require('cookie-session');
 var express = require("express");
-var cookieParser = require('cookie-parser');
+//var cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs');
 var app = express();
 app.set("view engine", "ejs");
-app.use(cookieParser());
+//app.use(cookieParser());
+
+app.use(cookieSession({
+  name: 'session',
+  keys: ["123", "456", "789"],
+
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -53,7 +62,7 @@ app.get("/urls", (req, res) => {
   //loops through the database of objects
   for(let url in urlDatabase) {
     //compares to see whether the id for a specific URL is the same as the current cookie user.
-    if(urlDatabase[url]["userID"] === req.cookies.user_id) {
+    if(urlDatabase[url]["userID"] === req.session.user_id) {
       //creates a shallow copy of our database that will also have a shortURL key and value pair.
       let copyURL = Object.assign({shortURL: url}, urlDatabase[url]);
       //pushes shallow object into array.
@@ -64,9 +73,9 @@ app.get("/urls", (req, res) => {
     user: users,
     urls: userURL,
   };
-  if(req.cookies.user_id)
+  if(req.session.user_id)
   {
-    templateVars["cookies"] = req.cookies.user_id;
+    templateVars["cookies"] = req.session.user_id;
     templateVars["loggedIn"] = true;
     res.render("urls_index", templateVars);
   }
@@ -81,9 +90,9 @@ app.get("/urls/new", (req, res) => {
     users: users,
     urls: urlDatabase
   };
-  if(req.cookies.user_id)
+  if(req.session.user_id)
   {
-    templateVars["cookies"] = req.cookies.user_id;
+    templateVars["cookies"] = req.session.user_id;
     templateVars["loggedIn"] = true;
     res.render("urls_new", templateVars);
   }
@@ -122,9 +131,9 @@ app.get("/urls/:id", (req, res) => {
     longURL: urlDatabase[req.params.id]["longURL"],
     user: users
   };
-  if(req.cookies.user_id)
+  if(req.session.user_id)
   {
-    templateVars["cookies"] = req.cookies.user_id;
+    templateVars["cookies"] = req.session.user_id;
     templateVars["loggedIn"] = true;
     res.render("urls_show", templateVars);
   }
@@ -144,7 +153,7 @@ app.get("/urls/:id", (req, res) => {
 app.post("/urls", (req, res) => {
   let shortkey = generateRandomString();
   let longURL = req.body.longURL;
-  let userID = req.cookies.user_id;
+  let userID = req.session.user_id;
   urlDatabase[shortkey] = {
     longURL: longURL,
     userID: userID
@@ -176,7 +185,8 @@ app.post("/register", (req, res) => {
       password: hashedPassword
     };
     console.log(users[userId]);
-    res.cookie("user_id", userId);
+    req.session.user_id = userId;
+    //res.cookie("user_id", userId);
 
     res.redirect("/login");
   };
@@ -202,7 +212,9 @@ app.post("/login", (req, res) => {
       //users[userId]["password"] !== req.body.password
     }
     else {
-      res.cookie("user_id", users[user]["id"]);
+      req.session.user_id = users[userId]["id"];
+      console.log(req.session.user_id);
+      //res.cookie("user_id", users[user]["id"]);
       res.redirect("/urls");
     }
   }
@@ -211,7 +223,7 @@ app.post("/login", (req, res) => {
 //helper function for finding userId given an email address
 //helper function for post(/"login") endpoint.
 function getId(email) {
-  for(user in users) {
+  for(let user in users) {
     if(users[user]["email"] === email)
       return users[user]["id"];
   }
@@ -219,7 +231,8 @@ function getId(email) {
 
 //logs the user out and clears cookie while redirecting to login page
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+  req.session = null;
+  //res.clearCookie("user_id");
   res.redirect("/login");
 });
 
