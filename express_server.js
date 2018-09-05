@@ -66,16 +66,29 @@ app.post("/urls", (req, res) => {
 //adds a new user object to global database.
 //holds user's email, password, and userId.
 app.post("/register", (req, res) => {
-  let userId = generateRandomString();
-  //console.log(req.body.email);
-  users[userId] = {
-    id: userId,
-    email: req.body.email,
-    password: req.body.password
+  let userEmails = Object.values(users).map(users => users.email);
+  //if either username or password section is empty
+  if(req.body.email === "" || req.body.password === "") {
+    return res.status(400).json({
+      error: "Invalid username or password"
+    });
+  }
+  //if username already exists
+  else if(userEmails.includes(req.body.email)) {
+    return res.status(400).json({
+      error: "Email already exists"
+    });
+  } else {
+    let userId = generateRandomString();
+    users[userId] = {
+      id: userId,
+      email: req.body.email,
+      password: req.body.password
+    };
+    res.cookie("username", userId);
+    res.redirect("/urls");
+    console.log(users);
   };
-  res.cookie("username", userId);
-  res.redirect("/urls");
-  console.log(users);
 });
 
 //deletes both shortURL and longURL from urlDatabase
