@@ -18,7 +18,7 @@
     <% for(let url in urls) { %>
       <li>
         <%=url%> -> <a href="<%= urls[url]%>"> <%= urls[url]%></a>
-         <a href="/urls/<%=url%>" style="padding-left:10px">Edit</a>
+        <a href="/urls/<%=url%>" style="padding-left:10px">Edit</a>
         <form method="POST" action="/urls/<%=url%>/delete"><button type="submit">Delete</button></form>
 
       </li>
@@ -27,7 +27,9 @@
 
 
 
-  <a href = "#">Shortened URL</a>
+
+
+  <a href = "/urls/new">Create new short URL</a>
 
 </body>
 </html>\
