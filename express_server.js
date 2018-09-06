@@ -1,10 +1,8 @@
 var cookieSession = require('cookie-session');
 var express = require("express");
-//var cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs');
 var app = express();
 app.set("view engine", "ejs");
-//app.use(cookieParser());
 
 app.use(cookieSession({
   name: 'session',
@@ -12,7 +10,7 @@ app.use(cookieSession({
 
   // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}))
+}));
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -77,7 +75,6 @@ app.get("/urls", (req, res) => {
   if(req.session.user_id)
   {
     templateVars["cookies"] = req.session.user_id;
-    templateVars["loggedIn"] = true;
     res.render("urls_index", templateVars);
   }
   else {
@@ -94,7 +91,6 @@ app.get("/urls/new", (req, res) => {
   if(req.session.user_id)
   {
     templateVars["cookies"] = req.session.user_id;
-    templateVars["loggedIn"] = true;
     res.render("urls_new", templateVars);
   }
   else {
@@ -111,6 +107,7 @@ app.get("/register", (req, res) => {
   res.render("urls_register", templateVars);
 });
 
+//renders the login page.
 app.get("/login", (req, res) => {
   let templateVars = {
     users: users,
@@ -135,7 +132,6 @@ app.get("/urls/:id", (req, res) => {
   if(req.session.user_id)
   {
     templateVars["cookies"] = req.session.user_id;
-    templateVars["loggedIn"] = true;
     res.render("urls_show", templateVars);
   }
   else {
@@ -178,6 +174,7 @@ app.post("/register", (req, res) => {
       error: "Email already exists"
     });
   } else {
+    //create a new user with a random 6 letter alphanumeric and a bcrypt hashed password.
     let userId = generateRandomString();
     let hashedPassword = bcrypt.hashSync(req.body.password, 10);
     users[userId] = {
@@ -185,10 +182,7 @@ app.post("/register", (req, res) => {
       email: req.body.email,
       password: hashedPassword
     };
-    console.log(users[userId]);
     req.session.user_id = userId;
-    //res.cookie("user_id", userId);
-
     res.redirect("/login");
   };
 });
@@ -210,12 +204,10 @@ app.post("/login", (req, res) => {
       res.status(403).json({
         error: "PASSWORD DOES NOT MATCH"
       });
-      //users[userId]["password"] !== req.body.password
     }
     else {
       req.session.user_id = users[userId]["id"];
       console.log(req.session.user_id);
-      //res.cookie("user_id", users[user]["id"]);
       res.redirect("/urls");
     }
   }
@@ -233,7 +225,6 @@ function getId(email) {
 //logs the user out and clears cookie while redirecting to login page
 app.post("/logout", (req, res) => {
   req.session = null;
-  //res.clearCookie("user_id");
   res.redirect("/login");
 });
 
